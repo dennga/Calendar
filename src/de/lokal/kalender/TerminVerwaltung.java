@@ -7,8 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.LocalDate;
 import java.util.ArrayList; // Importiert die ArrayList-Klasse, eine flexible Liste
 import java.util.List; // Importiert das List-Interface, das ArrayList implementiert
+import java.util.stream.Collectors;
 
 public class TerminVerwaltung { // Die Klasse, die sich um die Verwaltung unserer Termine kümmert
 
@@ -17,21 +19,33 @@ public class TerminVerwaltung { // Die Klasse, die sich um die Verwaltung unsere
 
     // Diese Methode versucht, die gespeicherten Termine aus der Datei zu laden
     public List<Termin> ladeTermine() {
-        try (FileInputStream fileIn = new FileInputStream(DATEIPFAD); // Öffnet die Datei zum Lesen
-             ObjectInputStream in = new ObjectInputStream(fileIn)) { // Macht es möglich, Java-Objekte aus der Datei zu lesen
-            termine = (List<Termin>) in.readObject(); // Liest die Liste der Termine aus der Datei und speichert sie in unserer 'termine'-Liste
-            System.out.println("Termine wurden geladen."); // Gibt eine Nachricht aus, dass das Laden erfolgreich war
-        } catch (FileNotFoundException e) { // Falls die Datei nicht gefunden wird...
-            System.out.println("Keine gespeicherten Termine gefunden. Starte mit einer leeren Liste."); // ...geben wir eine Meldung aus
-            termine = new ArrayList<>(); // ...und erstellen eine neue, leere Liste
-        } catch (IOException e) { // Falls es einen anderen Fehler beim Lesen der Datei gibt...
-            System.err.println("Fehler beim Laden der Termine: " + e.getMessage()); // ...geben wir eine Fehlermeldung aus
-            termine = new ArrayList<>(); // ...und stellen sicher, dass wir mit einer leeren Liste arbeiten
-        } catch (ClassNotFoundException e) { // Falls die 'Termin'-Klasse nicht gefunden wird (was sehr unwahrscheinlich ist, wenn unser Code korrekt ist)...
-            System.err.println("Klasse Termin nicht gefunden beim Laden: " + e.getMessage()); // ...geben wir eine Fehlermeldung aus
-            termine = new ArrayList<>(); // ...und arbeiten mit einer leeren Liste
+        try (FileInputStream fileIn = new FileInputStream(DATEIPFAD);
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            Object geladenesObjekt = in.readObject();
+            if (geladenesObjekt instanceof List<?>) { // Prüfen, ob das Objekt eine Liste ist
+                termine = (List<Termin>) geladenesObjekt; // Casten, wenn es eine Liste ist
+                // Zusätzliche Überprüfung (optional), ob alle Elemente in der Liste vom Typ Termin sind
+                if (termine.stream().allMatch(Termin.class::isInstance)) {
+                    System.out.println("Termine wurden geladen.");
+                } else {
+                    System.err.println("Fehler beim Laden: Die Datei enthält keine Liste von Termin-Objekten.");
+                    termine = new ArrayList<>();
+                }
+            } else {
+                System.err.println("Fehler beim Laden: Die Datei enthält kein Listen-Objekt.");
+                termine = new ArrayList<>();
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Keine gespeicherten Termine gefunden. Starte mit einer leeren Liste.");
+            termine = new ArrayList<>();
+        } catch (IOException e) {
+            System.err.println("Fehler beim Laden der Termine: " + e.getMessage());
+            termine = new ArrayList<>();
+        } catch (ClassNotFoundException e) {
+            System.err.println("Klasse Termin nicht gefunden beim Laden: " + e.getMessage());
+            termine = new ArrayList<>();
         }
-        return termine; // Gibt die Liste der geladenen (oder leeren) Termine zurück
+        return termine;
     }
 
     // Diese Methode nimmt eine Liste von Terminen und speichert sie in der Datei
@@ -68,4 +82,11 @@ public class TerminVerwaltung { // Die Klasse, die sich um die Verwaltung unsere
         this.termine.remove(termin);
 
     }
+
+
+public List<Termin> getTermineFuerTag(LocalDate tag) {
+    return termine.stream()
+            .filter(termin -> termin.getDatum().equals(tag)) // Filtert die Termine nach dem Datum
+            .collect(Collectors.toList()); // Sammelt die passenden Termine in einer neuen Liste
+}
 }
