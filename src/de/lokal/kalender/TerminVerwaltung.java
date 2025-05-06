@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList; // Importiert die ArrayList-Klasse, eine flexible Liste
 import java.util.List; // Importiert das List-Interface, das ArrayList implementiert
 import java.util.stream.Collectors;
@@ -84,9 +85,18 @@ public class TerminVerwaltung { // Die Klasse, die sich um die Verwaltung unsere
     }
 
 
-public List<Termin> getTermineFuerTag(LocalDate tag) {
-    return termine.stream()
-            .filter(termin -> termin.getDatum().equals(tag)) // Filtert die Termine nach dem Datum
-            .collect(Collectors.toList()); // Sammelt die passenden Termine in einer neuen Liste
-}
+    public List<Termin> getTermineFuerTag(LocalDate tag) {
+        return termine.stream()
+                .filter(termin -> termin.getDatum().equals(tag)) // Filtert die Termine nach dem Datum
+                .collect(Collectors.toList()); // Sammelt die passenden Termine in einer neuen Liste
+    }
+
+    // Neue Methode, um Termine für einen bestimmten Tag und eine bestimmte Zeitspanne abzurufen
+    public List<Termin> getTermineFuerZeitraum(LocalDate tag, LocalTime start, LocalTime end) {
+        return termine.stream()
+                .filter(termin -> termin.getDatum().equals(tag))
+                .filter(termin -> !termin.getEndTime().isBefore(start) && !termin.getStartTime().isAfter(end))
+                .collect(Collectors.toList());
+    }
+
 }
