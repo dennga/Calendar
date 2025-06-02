@@ -8,7 +8,7 @@ public class Termin implements Serializable { // die öffentliche Klasse namens 
 
     private static final long serialVersionUID = 1L;
     private LocalDate datum; // ein Datentyp (LocalDate) für das Datum
-    private String bezeichnung; // nur die Bezeichnung/name des Termins 
+    private String bezeichnung; // nur die Bezeichnung/name des Termins
     private String beschreibung; // ein Container (String) für die Beschreibung
     private String erinnerung; // ein Container (String) für die Erinnerung
     private String kategorie; // <- Hier fehlt die Deklaration der 'kategorie'-Variable!
@@ -44,7 +44,7 @@ public class Termin implements Serializable { // die öffentliche Klasse namens 
     public void setBeschreibung(String beschreibung) { // Setter-Methode für das 'Beschreibung'-Attribut, erlaubt das Ändern der Beschreibung
         this.beschreibung = beschreibung;
     }
-    
+
     public String getBezeichnung() { // Getter-Methode für das 'Beschreibungs'-Attribut, gibt den Wert der Beschreibung zurück
         return bezeichnung;
     }
@@ -60,7 +60,7 @@ public class Termin implements Serializable { // die öffentliche Klasse namens 
     public void setErinnerung(String erinnerung) { // Setter-Methode für das 'Erinnerungs'-Attribut, erlaubt das Ändern der Erinnerung
         this.erinnerung = erinnerung;
     }
-    
+
     public LocalTime getStartTime() {
         return startTime;
     }
